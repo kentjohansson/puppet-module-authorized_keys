@@ -4,9 +4,9 @@
 #
 class authorized_keys (
   $keys = undef,
-  $path = "/root/.ssh/authorized_keys",
+  $path = "${::home_root}/.ssh/authorized_keys",
 ) {
-
+  notice("$::home_root")
   if $keys != undef {
 
     include concat::setup
