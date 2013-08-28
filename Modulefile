@@ -8,3 +8,4 @@ description 'UNKNOWN'
 project_page 'UNKNOWN'
 
 dependency 'puppetlabs/stdlib',   '=> 3.2.x'
+dependency 'puppetlabs/concat',   '=> 1.0.x'
