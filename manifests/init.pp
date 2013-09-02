@@ -7,6 +7,10 @@ class authorized_keys (
   $path = "${::root_home}/.ssh/authorized_keys",
 ) {
 
+  if $::root_home == undef {
+    fail("Root_home is not found, please install stdlib")
+  }
+
   if $keys != undef {
 
     include concat::setup
