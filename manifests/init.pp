@@ -2,9 +2,12 @@
 #
 # Defines ssh-keys for root
 #
+# Method : concat or ssh_authorized_key
+
 class authorized_keys (
-  $keys = undef,
-  $path = "${::root_home}/.ssh/authorized_keys",
+  $keys   = undef,
+  $method = "concat",
+  $path   = "${::root_home}/.ssh/authorized_keys",
 ) {
 
   if $::root_home == undef {
@@ -12,31 +15,57 @@ class authorized_keys (
   }
 
   if $keys != undef {
+    if $method == "concat" {
+      include concat::setup
 
-    include concat::setup
+      concat { $path:
+        owner => root,
+        group => root,
+        mode  => '0600',
+      }
 
-    concat { $path:
-      owner => root,
-      group => root,
-      mode  => '0600',
+      concat::fragment { "header":
+        target  => $path,
+        content => "# This file is being maintained by Puppet.\n# DO NOT EDIT\n",
+        order   => 01,
+      }
+
+      create_resources('authorized_keys::concat_key',$keys)
     }
-
-    concat::fragment { "header":
-      target  => $path,
-      content => "# This file is being maintained by Puppet.\n# DO NOT EDIT\n",
-      order   => 01,
-    }
+    elsif $method == "ssh_authorized_key" {
 
     create_resources('authorized_keys::key',$keys)
+
+    } else {
+      fail("Unsuported method: ${method}") 
+    }
+
   }
 }
 
 define authorized_keys::key (
   $key,
+  $type,
+  $options,
 ) {
-
-  concat::fragment { $name:
-    target  => $authorized_keys::path,
-    content => "${key} ${name}\n",
+  ssh_authorized_key {
+    $name :
+      user => root,
+      type => $type,
+      key => $key,
+      options => $options,
   }
 }
+
+define authorized_keys::concat_key (
+  $key,
+  $type,
+  $options,
+) {
+  $options_tostring = join($options, ",")
+  concat::fragment { $name:
+    target  => $authorized_keys::path,
+    content => "${options_tostring} ${type} ${key} ${name}\n",
+  }
+}
+
