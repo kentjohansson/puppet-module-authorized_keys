@@ -15,6 +15,11 @@ class authorized_keys (
 
     include concat::setup
 
+    file { 'ssh-folder':
+      path   => "${::root_home}/.ssh",
+      ensure => "directory",
+    }
+
     concat { $path:
       owner => root,
       group => root,
