@@ -14,7 +14,9 @@ class authorized_keys (
     fail("Root_home is not found, please install stdlib")
   }
 
-  if $keys != undef {
+  $authkeys = hiera_hash('authorized_keys::keys')
+
+  if $authkeys != undef {
     if $method == "concat" {
       include concat::setup
 
@@ -35,11 +37,11 @@ class authorized_keys (
         order   => 01,
       }
 
-      create_resources('authorized_keys::concat_key',$keys)
+      create_resources('authorized_keys::concat_key',$authkeys)
     }
     elsif $method == "ssh_authorized_key" {
 
-    create_resources('authorized_keys::key',$keys)
+    create_resources('authorized_keys::key',$authkeys)
 
     } else {
       fail("Unsuported method: ${method}") 
