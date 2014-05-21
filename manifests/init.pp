@@ -2,7 +2,7 @@
 #
 # Defines ssh-keys for root
 #
-class root-authorized_keys (
+class root_authorized_keys (
   $keys = undef,
   $path = "${::root_home}/.ssh/authorized_keys",
 ) {
@@ -32,16 +32,16 @@ class root-authorized_keys (
       order   => 01,
     }
 
-    create_resources('root-authorized_keys::key',$keys)
+    create_resources('root_authorized_keys::key',$keys)
   }
 }
 
-define root-authorized_keys::key (
+define root_authorized_keys::key (
   $key,
 ) {
 
   concat::fragment { $name:
-    target  => $root-authorized_keys::path,
+    target  => ${root_authorized_keys::path},
     content => "${key} ${name}\n",
   }
 }
