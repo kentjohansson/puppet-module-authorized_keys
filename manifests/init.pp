@@ -41,7 +41,7 @@ define root_authorized_keys::key (
 ) {
 
   concat::fragment { $name:
-    target  => ${root_authorized_keys::path},
+    target  => $root_authorized_keys::path,
     content => "${key} ${name}\n",
   }
 }
